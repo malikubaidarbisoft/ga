@@ -20,7 +20,7 @@ jobs:
     - name: Check Semver in PR Title and Commit Message
       id: pr
       run: |
-        git log HEAD~5...HEAD
+        #git log HEAD~5...HEAD
         git branch
         # echo "GITHUB_REF##*/=${GITHUB_REF##*/}"
         # echo "GITHUB_REF#refs/heads/=${GITHUB_REF#refs/heads/}"
