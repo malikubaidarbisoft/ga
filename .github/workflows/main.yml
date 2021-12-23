@@ -39,9 +39,11 @@ jobs:
             echo "Sermer exists in PR title and commit message"
           else
              echo "Semver doesnot match in PR title and commit message"
+             exit 1
           fi
         else
           echo "Sermver doesnot exists in PR title or commit message"
+          exit 1
         fi
       # env:
       # GITHUB_BRANCH: ${{ github.ref }}
