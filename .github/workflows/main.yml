@@ -1,36 +1,47 @@
-# This is a basic workflow to help you get started with Actions
+name: Semver Check
 
-name: CI
-
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the main branch
-  push:
-    branches: [ main ]
   pull_request:
-    branches: [ main ]
+    types: [opened, synchronize, reopened, edited, ready_for_review]
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  Deploy:
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
-
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
-
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
-        run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+    - uses: actions/checkout@v1
+    - name: reattach HEAD to Head Ref
+      run: git checkout "$(echo ${{ github.head_ref }} | sed -E 's|refs/[a-zA-Z]+/||')"
+      if: github.head_ref != ''
+    # - name: Prepare repository
+    #   run: git pull origin waqas_gh_action
+    # - name: reattach HEAD to Ref
+    #   run: git checkout "$(echo ${{ github.ref }} | sed -E 's|refs/[a-zA-Z]+/||')"
+    #   if: github.head_ref == ''
+    - name: Check Semver in PR Title and Commit Message
+      id: pr
+      run: |
+        git log HEAD~5...HEAD
+        git branch
+        # echo "GITHUB_REF##*/=${GITHUB_REF##*/}"
+        # echo "GITHUB_REF#refs/heads/=${GITHUB_REF#refs/heads/}"
+        # echo "GITHUB_BRANCH##*/=${GITHUB_BRANCH##*/}"
+        # git checkout waqas_gh_action
+        # git branch
+        pull_request_title="${{ github.event.pull_request.title }}"
+        commit_message="$(git log --format=%B -n 1)"
+        # commit_message="$(git log HEAD~10...HEAD)"
+        echo "pull_request_title=$pull_request_title"
+        echo "commit_message=$commit_message"
+        PR_SEMVER_SUBJECT=$(echo "${pull_request_title}" | sed -En 's/.*\[semver:(major|minor|patch|skip)\].*/\1/p')
+        PR_SEMVER_MESSAGE=$(echo "${commit_message}" | sed -En 's/.*\[semver:(major|minor|patch|skip)\].*/\1/p')
+        if [[ ! -z "$PR_SEMVER_SUBJECT" && ! -z "$PR_SEMVER_MESSAGE" ]]; then    
+          if [[ $PR_SEMVER_SUBJECT == $PR_SEMVER_MESSAGE ]]; then
+            echo "Sermer exists in PR title and commit message"
+          else
+             echo "Semver doesnot match in PR title and commit message"
+          fi
+        else
+          echo "Sermver doesnot exists in PR title or commit message"
+        fi
+      # env:
+      # GITHUB_BRANCH: ${{ github.ref }}
