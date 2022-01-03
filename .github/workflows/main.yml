@@ -20,30 +20,4 @@ jobs:
     - name: Check Semver in PR Title and Commit Message
       id: pr
       run: |
-        #git log HEAD~5...HEAD
-        git branch
-        # echo "GITHUB_REF##*/=${GITHUB_REF##*/}"
-        # echo "GITHUB_REF#refs/heads/=${GITHUB_REF#refs/heads/}"
-        # echo "GITHUB_BRANCH##*/=${GITHUB_BRANCH##*/}"
-        # git checkout waqas_gh_action
-        # git branch
-        pull_request_title="${{ github.event.pull_request.title }}"
-        commit_message="$(git log --format=%B -n 1)"
-        # commit_message="$(git log HEAD~10...HEAD)"
-        echo "pull_request_title=$pull_request_title"
-        echo "commit_message=$commit_message"
-        PR_SEMVER_SUBJECT=$(echo "${pull_request_title}" | sed -En 's/.*\[semver:(major|minor|patch|skip)\].*/\1/p')
-        PR_SEMVER_MESSAGE=$(echo "${commit_message}" | sed -En 's/.*\[semver:(major|minor|patch|skip)\].*/\1/p')
-        if [[ ! -z "$PR_SEMVER_SUBJECT" && ! -z "$PR_SEMVER_MESSAGE" ]]; then    
-          if [[ $PR_SEMVER_SUBJECT == $PR_SEMVER_MESSAGE ]]; then
-            echo "Sermer exists in PR title and commit message"
-          else
-             echo "Semver doesnot match in PR title and commit message"
-             exit 1
-          fi
-        else
-          echo "Sermver doesnot exists in PR title or commit message"
-          exit 1
-        fi
-      # env:
-      # GITHUB_BRANCH: ${{ github.ref }}
+        echo "This is workflow"
