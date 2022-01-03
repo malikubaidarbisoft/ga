@@ -21,4 +21,4 @@ jobs:
       id: pr
       run: |
         echo "This is workflow"
-       
+        exit 1
